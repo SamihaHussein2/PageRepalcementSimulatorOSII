@@ -1,0 +1,237 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package projectos2;
+import java.util.Scanner;
+import java.io.*;
+import java.util.LinkedList;
+import java.util.Queue; 
+import java.util.HashSet; 
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Deque;
+import java.util.ArrayList;
+import java.io.File;  // Import the File class
+import java.io.FileNotFoundException;  // Import this class to handle errors
+
+/**
+ *
+ * @author samiha hussein
+ */
+public class input {
+    
+
+    public input() throws FileNotFoundException, IOException{
+        
+     
+     int UserChoice;   
+     int FreeFrame;
+     int FreeFrameFile;
+     int PageNum;
+     int[] Pages = new int[100];   //array of page 
+     int[] AnsArray=new int[10];  //array answer of (freeframe) inputs
+     //FIFO 
+     Queue<Integer> AnsQ = new LinkedList<>();
+     //LRU
+       //Deque<Integer> doubleCheck = new LinkedList<Integer>();   //doubly queue linked list check
+     //HashSet<Integer> hashSet= new HashSet<Integer>();    
+     int []counterFrame;
+     ArrayList<Integer> ArrayofLRU = new ArrayList<Integer>();
+     //LinkedList<Integer> ArrayofLRUFcheck = new LinkedList<>();
+ 
+     //files input
+     ArrayList<String> hh= new ArrayList<String>();  
+     
+     System.out.println("Welcome to page replacement application!");  
+      Scanner sc= new Scanner(System.in);
+      int UserChoiceType;
+        System.out.println("choose type of input");
+        System.out.println("1.User input");
+        System.out.println("2.Files input");
+        UserChoiceType=sc.nextInt();
+        
+        if(UserChoiceType==2)
+        {    //files input
+            
+          System.out.println("please enter number of free frames:");
+            FreeFrameFile=sc.nextInt();
+          
+            File pagesF= new File("filename.txt");
+            Scanner FileReader= new Scanner (pagesF);
+            while(FileReader.hasNextLine()){
+                String data= FileReader.nextLine();
+                hh.add(data);
+            }
+            
+            FileReader.close();
+            
+            
+            for(int r=0;r<hh.size();r++ ){
+                String Q=hh.get(r);
+                hh.get(r).split(" ");
+                System.out.println(Integer.parseInt(hh.get(r)));
+             System.out.println("pages array: "+ Integer.parseInt(hh.get(r)) );   
+            //Pages[r]=Integer.parseInt(Q);
+            
+            }
+            
+        }  
+        
+        
+        
+      if(UserChoiceType== 1){    //type of input
+          
+     System.out.println("please enter number of free frames:");
+     FreeFrame=sc.nextInt();
+        //System.out.println(FreeFrame);  check
+     
+     System.out.println("please enter number of pages:");  
+     PageNum=sc.nextInt();
+     
+     System.out.println("please fill the pages:");
+     for(int t=0;t<PageNum;t++)
+     {
+         Pages[t]=sc.nextInt();
+     }
+     
+     
+     
+     System.out.println("choose desired algorithm:");
+     System.out.println("1.FIFO (first in first out)");
+     System.out.println("2.LRU (least recently used");
+     System.out.println("3.Optimal algoritm");
+     UserChoice=sc.nextInt();
+     
+     
+     
+     //begining of calculation FIFO
+     if(UserChoice==1){    //FIFO
+     int fault=0;  //counter of faults
+     boolean hit;
+     int hitCalc=0;
+     System.out.println("Answer :");
+     
+     for(int i=0;i<PageNum;i++){
+     System.out.println(Pages[i]+ " " ); 
+     hit=AnsQ.contains(Pages[i]);
+     
+     if(hit) { System.out.println("[no page fault]");  hitCalc++;}
+     if(!hit){
+     fault++;
+     if(AnsQ.size()==FreeFrame){
+     AnsQ.remove(); 
+     }
+     AnsQ.add(Pages[i]);
+     
+         System.out.println( AnsQ);
+     } }
+     
+     System.out.println("number of faults: "+ fault);
+    System.out.println("number of hits: "+ hitCalc);
+     
+}
+     
+     
+     else if(UserChoice==2){ //LRU  
+         
+         int PageFaultLRU=0;
+         int HitLRU=0;
+        
+         System.out.println("Answer :");
+         
+          counterFrame=new int[FreeFrame];
+          int min=0;
+                        int max=0;
+                        min=counterFrame[0]; 
+                        max=counterFrame[1];   
+         
+         
+                for (int i=0;i<PageNum;i++){
+                    if(ArrayofLRU.size() < FreeFrame ){
+                        
+                    boolean checkForHit =ArrayofLRU.contains(Pages[i]);
+                    if(!checkForHit){ 
+                        PageFaultLRU++;
+                        ArrayofLRU.add(Pages[i]);
+                        counterFrame[i]=i;
+                        System.out.println("page fault a2al mn freeframe:" + ArrayofLRU);
+                        System.out.println("counter array a2al mn freeframe:" + counterFrame[i]);
+                        
+                    }
+                    else{  HitLRU++; 
+                    counterFrame[i]=i;
+                        System.out.println("hit a2al mn freeframe:" + ArrayofLRU);
+                        System.out.println("counter array a2al mn freeframe(hit):" + counterFrame[i]);
+                        
+                        
+                    } 
+                    
+                    }    
+                    else{
+                        
+                        boolean checkForHit =ArrayofLRU.contains(Pages[i]);
+                        if(!checkForHit){
+                          
+                        for(int y=0;y<counterFrame.length;y++){
+                             
+                            if(min>counterFrame[y]){
+                                min=counterFrame[y];  
+                            }  
+                            if(max<counterFrame[y]){
+                            max=counterFrame[y];
+                            }
+                        }
+                        counterFrame[min]=max++;
+                       
+                           
+                        PageFaultLRU++;
+                        ArrayofLRU.set(min, Pages[i]);
+                        if(min>counterFrame.length){ min--; }
+                        if(min<counterFrame.length){  min++; }
+                      
+                        
+                        System.out.println("page fault array akbar mn free frame:" + ArrayofLRU);
+                        
+                    }  else{  
+                            HitLRU++; //counterFrame[i]=i;  
+                            for(int y=0;y<counterFrame.length;y++){
+                             
+                            if(min>counterFrame[y]){
+                                min=counterFrame[y];
+                            }  
+                            if(max<counterFrame[y]){
+                            max=counterFrame[y];
+                            }
+                        }
+                            
+                            counterFrame[min]=max++;
+                            
+                              
+                            System.out.println("hit array akbar mn free frame:" + ArrayofLRU);
+                            min++;    if(min>counterFrame.length){ min--; }
+                        }
+                        
+                    }
+                    
+                   
+                      }
+                System.out.println("page fault occured:="+ PageFaultLRU);
+                System.out.println("hit occured:="+ HitLRU);
+               
+                  }
+
+ }   
+      
+              
+         }
+}
+        
+  
+
+
+
+    
+    
+    
